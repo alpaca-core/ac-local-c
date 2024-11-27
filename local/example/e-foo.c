@@ -21,17 +21,20 @@ int main(void) {
     ac_add_plugin_dir(ACLP_OUT_DIR);
     ac_load_all_plugins();
 
-    ac_local_model_desc_asset model_asset = {
+    ac_local_model_asset_info model_asset = {
         .path = AC_FOO_MODEL_SMALL,
         .tag = "x"
+    };
+    ac_local_model_asset_desc desc = {
+        .type = "foo",
+        .assets = &model_asset,
+        .assets_count = 1,
+        .name = "foo small"
     };
 
     printf("Loading model...\n");
     ac_local_instance* instance = NULL;
-    ac_local_model* model = ac_create_local_model(
-        "foo", &model_asset, 1,
-        ac_dict_arg_null(), NULL, NULL
-    );
+    ac_local_model* model = ac_load_local_model(desc, ac_dict_arg_null(), NULL, NULL);
     if (!model) {
         ret = 1;
         goto cleanup;

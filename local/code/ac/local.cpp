@@ -5,8 +5,8 @@
 
 #include <ac/local/Instance.hpp>
 #include <ac/local/Model.hpp>
+#include <ac/local/ModelAssetDesc.hpp>
 #include <ac/local/Lib.hpp>
-#include <ac/local/ModelLoaderRegistry.hpp>
 #include <ac/local/PluginManager.hpp>
 
 #include <ac/DictCUtil.hpp>
@@ -98,24 +98,25 @@ ac_local_instance* ac_create_local_instance(
     });
 }
 
-ac_local_model* ac_create_local_model(
-    const char* inference_type,
-    ac_local_model_desc_asset* assets,
-    size_t assets_count,
+ac_local_model* ac_load_local_model(
+    ac_local_model_asset_desc cdesc,
     ac_dict_arg cparams,
     bool (*progress_cb)(ac_sv tag, float progress, void* user_data),
     void* cb_user_data
 ) {
     return local_try_catch([&] {
-        ModelDesc desc = {.inferenceType = inference_type};
-        desc.assets.reserve(assets_count);
-        for (size_t i = 0; i < assets_count; ++i) {
+        ModelAssetDesc desc = {.type = cdesc.type};
+        desc.assets.reserve(cdesc.assets_count);
+        for (size_t i = 0; i < cdesc.assets_count; ++i) {
             auto& info = desc.assets.emplace_back();
-            assert(assets[i].path);
-            info.path = assets[i].path;
-            if (assets[i].tag) {
-                info.tag = assets[i].tag;
+            assert(cdesc.assets[i].path);
+            info.path = cdesc.assets[i].path;
+            if (cdesc.assets[i].tag) {
+                info.tag = cdesc.assets[i].tag;
             }
+        }
+        if (cdesc.name) {
+            desc.name = cdesc.name;
         }
 
         ProgressCb pcb;
@@ -125,7 +126,7 @@ ac_local_model* ac_create_local_model(
             };
         }
 
-        auto model = ac::local::Lib::modelLoaderRegistry().createModel(
+        auto model = ac::local::Lib::loadModel(
             astl::move(desc), Dict_from_dict_arg(cparams), astl::move(pcb));
         return new ac_local_model{astl::move(model)};
     });

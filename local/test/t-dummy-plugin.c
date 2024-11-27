@@ -14,8 +14,12 @@ ac_dict_arg make_params(ac_dict_ref temp, const char* json) {
 void local_dummy(void) {
     ac_load_plugin(ACLP_dummy_PLUGIN_FILE);
 
-    ac_local_model* synthetic_model = ac_create_local_model(
-        "dummy", NULL, 0, ac_dict_arg_null(), NULL, NULL);
+    ac_local_model_asset_desc desc = {
+        .type = "dummy",
+        .name = "synthetic dummy"
+    };
+
+    ac_local_model* synthetic_model = ac_load_local_model(desc, ac_dict_arg_null(), NULL, NULL);
     CHECK_NOT_NULL(synthetic_model);
     CHECK_NULL(ac_local_get_last_error());
 

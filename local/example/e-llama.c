@@ -31,15 +31,18 @@ int main(void) {
 
     ac_local_instance* instance = NULL;
 
-    ac_local_model_desc_asset llama_gguf = {
+    ac_local_model_asset_info llama_gguf = {
         .path = AC_TEST_DATA_LLAMA_DIR "/gpt2-117m-q6_k.gguf",
+    };
+    ac_local_model_asset_desc desc = {
+        .type = "llama.cpp gguf",
+        .assets = &llama_gguf,
+        .assets_count = 1,
+        .name = "gpt2 117m"
     };
 
     printf("Loading model...\n");
-    ac_local_model* model = ac_create_local_model(
-        "llama", &llama_gguf, 1,
-        ac_dict_arg_null(), on_progress, NULL
-    );
+    ac_local_model* model = ac_load_local_model(desc, ac_dict_arg_null(), on_progress, NULL);
     if (!model) {
         ret = 1;
         goto cleanup;

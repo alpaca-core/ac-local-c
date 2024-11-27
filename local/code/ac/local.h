@@ -58,17 +58,23 @@ AC_C_LOCAL_EXPORT ac_local_instance* ac_create_local_instance(
 );
 
 /// Asset info for creating a local model.
-typedef struct ac_local_model_desc_asset {
+typedef struct ac_local_model_asset_info {
     const char* path; ///< Path to the asset.
     const char* tag;  ///< Tag of the asset (may be `NULL`).
-} ac_local_model_desc_asset;
+} ac_local_model_asset_info;
+
+/// Asset description for creating a local model.
+typedef struct ac_local_model_asset_desc {
+    const char* type; ///< Type of the asset.
+    ac_local_model_asset_info* assets; ///< Array of asset infos.
+    size_t assets_count; ///< Number of assets.
+    const char* name; ///< Optional name of the model (only used for logging)
+} ac_local_model_asset_desc;
 
 /// Create a local model.
 /// Returns `NULL` on error.
-AC_C_LOCAL_EXPORT ac_local_model* ac_create_local_model(
-    const char* inference_type,
-    ac_local_model_desc_asset* assets,
-    size_t assets_count,
+AC_C_LOCAL_EXPORT ac_local_model* ac_load_local_model(
+    ac_local_model_asset_desc desc,
     ac_dict_arg params,
     bool (*progress_cb)(ac_sv tag, float progress, void* user_data),
     void* cb_user_data

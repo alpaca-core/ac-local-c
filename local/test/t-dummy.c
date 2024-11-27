@@ -34,19 +34,29 @@ ac_dict_arg make_params(ac_dict_ref temp, const char* json) {
 }
 
 void local_dummy(void) {
-    ac_local_model* model = ac_create_local_model("dummy", NULL, 0, ac_dict_arg_null(), NULL, NULL);
+    const ac_local_model_asset_desc synthetic_desc = {
+        .type = "dummy",
+        .name = "synthetic dummy"
+    };
+    ac_local_model* model = ac_load_local_model(synthetic_desc, ac_dict_arg_null(), NULL, NULL);
     CHECK_NULL(model);
 
-    CHECK_EQ_STR("No loader found for schema type: dummy", ac_local_get_last_error());
+    CHECK_EQ_STR("No loader found for: synthetic dummy", ac_local_get_last_error());
 
     add_dummy_to_ac_local_global_registry();
 
-    ac_local_model_desc_asset model_asset = {
+    ac_local_model_asset_info model_asset = {
         .path = DUMMY_MODEL,
         .tag = "x"
     };
+    const ac_local_model_asset_desc model_desc = {
+        .type = "dummy",
+        .assets = &model_asset,
+        .assets_count = 1,
+        .name = "dummy model",
+    };
     progress_info info = { 0 };
-    model = ac_create_local_model("dummy", &model_asset, 1, ac_dict_arg_null(), on_progress, &info);
+    model = ac_load_local_model(model_desc, ac_dict_arg_null(), on_progress, &info);
     CHECK_NULL(ac_local_get_last_error());
     CHECK_NOT_NULL(model);
     CHECK_EQ_STR(DUMMY_MODEL, info.tag);
@@ -105,8 +115,7 @@ void local_dummy(void) {
     CHECK_EQ_STR("a soco b bate c soco", ac_dict_get_string_value(ac_dict_at_key(result, "result")));
 
 
-    ac_local_model* synthetic_model = ac_create_local_model(
-        "dummy", NULL, 0, ac_dict_arg_null(), on_progress, &info);
+    ac_local_model* synthetic_model = ac_load_local_model(synthetic_desc, ac_dict_arg_null(), on_progress, &info);
     CHECK_NOT_NULL(synthetic_model);
     CHECK_NULL(ac_local_get_last_error());
     CHECK_EQ_STR("synthetic", info.tag);
