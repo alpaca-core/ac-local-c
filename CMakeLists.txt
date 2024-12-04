@@ -34,7 +34,7 @@ mark_as_advanced(AC_LOCAL_C_BUILD_TESTS AC_LOCAL_C_BUILD_EXAMPLES)
 #######################################
 # packages
 
-add_ac_local(0.1.3)
+add_ac_local(0.1.4)
 CPMAddPackage(gh:iboB/splat@1.3.3)
 
 #######################################
