@@ -33,6 +33,8 @@ AC_C_LOCAL_EXPORT void ac_free_local_instance(ac_local_instance* i);
 /// Run an op on a local instance
 /// `target` is where the result of the operation is stored.
 /// @return `target` or `NULL` on error.
+///
+/// `progress_cb` can be `NULL`
 AC_C_LOCAL_EXPORT ac_dict_ref ac_run_local_op(
     ac_dict_ref target,
     ac_local_instance* i,
@@ -63,7 +65,7 @@ typedef struct ac_local_model_asset_info {
     const char* tag;  ///< Tag of the asset (may be `NULL`).
 } ac_local_model_asset_info;
 
-/// Asset description for creating a local model.
+/// Asset description for local model creation.
 typedef struct ac_local_model_asset_desc {
     const char* type; ///< Type of the asset.
     ac_local_model_asset_info* assets; ///< Array of asset infos.
@@ -73,6 +75,8 @@ typedef struct ac_local_model_asset_desc {
 
 /// Create a local model.
 /// Returns `NULL` on error.
+///
+/// `progress_cb` can be `NULL`
 AC_C_LOCAL_EXPORT ac_local_model* ac_load_local_model(
     ac_local_model_asset_desc desc,
     ac_dict_arg params,
@@ -80,9 +84,17 @@ AC_C_LOCAL_EXPORT ac_local_model* ac_load_local_model(
     void* cb_user_data
 );
 
+/// Load a plugin from a file ignoring the search path
 AC_C_LOCAL_EXPORT void ac_load_plugin(const char* path);
+
+/// Add a directory to the plugin search path
 AC_C_LOCAL_EXPORT void ac_add_plugin_dir(const char* path);
+
+/// Add directories to the plugin search path from an environment variable.
+/// The separator (if any) is expected to be `;` on Windows and `:` on other platforms.
 AC_C_LOCAL_EXPORT void ac_add_plugin_dirs_from_env(const char* env_var);
+
+/// Load all plugins from the plugin search path
 AC_C_LOCAL_EXPORT void ac_load_all_plugins(void);
 
 /// @}
